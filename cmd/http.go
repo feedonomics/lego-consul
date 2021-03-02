@@ -2,15 +2,12 @@ package cmd
 
 import (
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/hashicorp/consul/api"
 	"github.com/julienschmidt/httprouter"
 	"github.com/sirupsen/logrus"
-
-	// "github.com/julienschmidt/httprouter"
-	"net/http"
-
 	"github.com/spf13/cobra"
 )
 
