@@ -53,6 +53,18 @@ jobs:
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
         shell: bash
 
+      - name: Download release upload URL
+        uses: actions/download-artifact@v2
+        with:
+          name: upload_url
+
+      - name: Get release upload URL
+        id: upload_url
+        run: |
+          URL=$(cat upload_url.txt)
+          echo "::set-output name=url::${URL}"
+        shell: bash
+
       - name: Upload Linux/macOS Release
         uses: actions/upload-release-asset@v1
         env:
