@@ -1,0 +1,63 @@
+name: Release
+
+on:
+  push:
+    tags: 'v*'
+
+env:
+  GO_VERSION: 1.15.8
+
+jobs:
+  create-release:
+    name: Create
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Save release upload URL
+        run: echo "${{ steps.create_release.outputs.upload_url }}" > ./upload_url.txt
+        shell: bash
+
+      - name: Store release upload URL
+        uses: actions/upload-artifact@v2
+        with:
+          name: upload_url
+          path: ./upload_url.txt
+
+  publish:
+    name: Publish binary
+    needs: create-release
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Build for Linux/macOS
+        run: go build -ldflags "-s -w -X github.com/ottodashadow/lego-consul/version.commit=`git describe --always --dirty` -X github.com/ottodashadow/lego-consul/version.date=`date -u +%FT%TZ`" -o bin/lego-consul
+
+      - name: Get CLI version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+        shell: bash
+
+      - name: Upload Linux/macOS Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.upload_url.outputs.url }}
+          asset_path: ./bin/bin/lego-consul
+          asset_name: sftpgo_${{ steps.get_version.outputs.VERSION }}_linux_x86_64.tar.xz
