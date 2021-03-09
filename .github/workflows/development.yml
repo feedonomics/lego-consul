@@ -24,7 +24,6 @@ jobs:
         run: go test -v -p 1 -timeout 10m ./... -coverprofile=coverage.txt -covermode=atomic
 
       - name: Upload coverage to Codecov
-        if: ${{ matrix.upload-coverage }}
         uses: codecov/codecov-action@v1
         with:
           file: ./coverage.txt
