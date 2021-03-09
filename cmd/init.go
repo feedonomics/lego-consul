@@ -1,12 +1,12 @@
 package cmd
 
 import (
-	"github.com/ottodashadow/lego-consul/version"
 	"os"
 
 	"github.com/go-acme/lego/v4/lego"
 
 	"github.com/ottodashadow/lego-consul/config"
+	"github.com/ottodashadow/lego-consul/version"
 )
 
 var (
