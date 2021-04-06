@@ -27,6 +27,9 @@ func init() {
 	RootCmd.AddCommand(httpConsulCmd)
 	RootCmd.AddCommand(generateCmd)
 	RootCmd.AddCommand(renewCmd)
+	RootCmd.AddCommand(manageSANsCmd)
+
+	manageSANsCmd.AddCommand(addSANsCmd)
 
 	RootCmd.PersistentFlags().BoolVar(&config.Quiet, `quiet`, false, `Silence all output except errors. Useful for automation via cron.`)
 
@@ -41,6 +44,9 @@ func init() {
 	renewCmd.Flags().BoolVar(&config.TLSInsecure, `insecure`, false, `Skip TLS Verification of ACME Server (use for local dev)`)
 	renewCmd.Flags().BoolVar(&forceRenewal, `force`, false, `Ignore certificate expiration and force generation of new certificates`)
 	renewCmd.Flags().StringVar(&postHookCmd, `post-hook`, ``, `Command to run after certificate renewal process.`)
+
+	addSANsCmd.Flags().StringVar(&Domain, `domain`, ``, `Main domain name to generate a certificate for. Should be servers official hostname.`)
+	addSANsCmd.Flags().StringArrayVar(&SANs, `sans`, []string{}, `Subject Alt-Names to include when generating the certificate.`)
 
 	httpConsulCmd.Flags().StringVar(&httpConsulBind, `bind`, `127.0.0.1:5002`, `Address and port to listen on.`)
 

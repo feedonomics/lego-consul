@@ -24,6 +24,7 @@ import (
 	"github.com/ottodashadow/lego-consul/paths"
 	"github.com/ottodashadow/lego-consul/solvers"
 	"github.com/ottodashadow/lego-consul/types"
+	"github.com/ottodashadow/lego-consul/utility"
 )
 
 var (
@@ -100,7 +101,7 @@ func ProcessRenewal(RenewalCfgPath string, Force bool) (bool, error) {
 		return false, fmt.Errorf(`[%s] no certificates loaded from Certificate file path`, RenewalCfg.Domain)
 	}
 
-	if !Force && !needRenewal(Certificates[0], RenewalCfg.Domain, 30) {
+	if !Force && !needRenewal(Certificates[0], RenewalCfg.Domain, RenewalCfg.SANs, 30) {
 		logrus.Infof(`[%s] certificate renewal is not required`, RenewalCfg.Domain)
 		return false, nil
 	}
@@ -205,9 +206,18 @@ func readCertificate(path string) ([]*x509.Certificate, error) {
 	return certcrypto.ParsePEMBundle(content)
 }
 
-func needRenewal(x509Cert *x509.Certificate, domain string, days int) bool {
+func needRenewal(x509Cert *x509.Certificate, domain string, AltNames []string, days int) bool {
 	if x509Cert.IsCA {
 		logrus.Fatalf("[%s] Certificate bundle starts with a CA certificate", domain)
+	}
+
+	for _, desiredAltName := range AltNames {
+		if desiredAltName != domain &&
+			!utility.ExistsStrings(x509Cert.DNSNames, desiredAltName) {
+			logrus.Infof(`[%s] The certificate does not include the requested subject alternate name %s: yes renewal`,
+				domain, desiredAltName)
+			return true
+		}
 	}
 
 	if days >= 0 {
