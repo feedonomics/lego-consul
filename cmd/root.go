@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log/syslog"
 	"os"
 	"time"
 
@@ -30,6 +31,14 @@ var RootCmd = &cobra.Command{
 
 		if config.Quiet {
 			logrus.SetLevel(logrus.WarnLevel)
+		}
+
+		if config.Syslog {
+			Log, err := syslog.New(syslog.LOG_NOTICE, `lego_acme`)
+			if err != nil {
+				return err
+			}
+			logrus.SetOutput(Log)
 		}
 
 		ConsulCfgPath := fmt.Sprintf(`%s/conf.d/consul.json`, config.Path)

@@ -32,6 +32,7 @@ func init() {
 	manageSANsCmd.AddCommand(addSANsCmd)
 
 	RootCmd.PersistentFlags().BoolVar(&config.Quiet, `quiet`, false, `Silence all output except errors. Useful for automation via cron.`)
+	RootCmd.PersistentFlags().BoolVar(&config.Syslog, `syslog`, false, `Write log events to syslog instead of stderr.`)
 
 	generateCmd.Flags().StringVar(&config.DirectoryURL, `server`, lego.LEDirectoryProduction, `CA Server Directory URL`)
 	generateCmd.Flags().BoolVar(&config.TLSInsecure, `insecure`, false, `Skip TLS Verification of ACME Server (use for local dev)`)

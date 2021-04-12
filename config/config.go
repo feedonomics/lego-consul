@@ -7,4 +7,5 @@ var (
 	Path         string
 	TLSInsecure  bool
 	Quiet        bool
+	Syslog       bool
 )
