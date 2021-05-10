@@ -20,6 +20,7 @@ import (
 type FilePathSet struct {
 	Domain      string
 	Directory   string
+	All         string
 	Certificate string
 	PrivateKey  string
 	Chain       string
@@ -43,6 +44,7 @@ func GetArchiveFileSet(Domain string) (FilePathSet, error) {
 		Set := FilePathSet{
 			Domain:      Domain,
 			Directory:   path.Clean(archiveFolder),
+			All:         path.Clean(fmt.Sprintf(`%s/all%d.pem`, archiveFolder, index)),
 			Certificate: path.Clean(fmt.Sprintf(`%s/cert%d.pem`, archiveFolder, index)),
 			PrivateKey:  path.Clean(fmt.Sprintf(`%s/privkey%d.pem`, archiveFolder, index)),
 			Chain:       path.Clean(fmt.Sprintf(`%s/chain%d.pem`, archiveFolder, index)),
@@ -77,6 +79,7 @@ func GetLiveFileSet(Domain string) FilePathSet {
 	return FilePathSet{
 		Domain:      Domain,
 		Directory:   Directory,
+		All:         Directory + `/all.pem`,
 		Certificate: Directory + `/cert.pem`,
 		PrivateKey:  Directory + `/privkey.pem`,
 		Chain:       Directory + `/chain.pem`,
@@ -112,6 +115,12 @@ func (Set *FilePathSet) WriteFiles(certificates *certificate.Resource) error {
 		return err
 	}
 
+	all := []byte(fmt.Sprintf("%s\n%s\n%s", certificateOnly, bytes.TrimSpace(certificates.IssuerCertificate), bytes.TrimSpace(certificates.PrivateKey)))
+	if err := ioutil.WriteFile(Set.All, all, 0600); err != nil {
+		logrus.Warnf(`[%s] failed to write all.pem to archive folder.`, certificates.Domain)
+		return err
+	}
+
 	return nil
 }
 
@@ -125,6 +134,7 @@ func (Set *FilePathSet) Activate(Live FilePathSet) error {
 	Set.Chain = strings.Replace(Set.Chain, Set.Directory, `../../archive/`+Live.Domain, 1)
 	Set.FullChain = strings.Replace(Set.FullChain, Set.Directory, `../../archive/`+Live.Domain, 1)
 	Set.PrivateKey = strings.Replace(Set.PrivateKey, Set.Directory, `../../archive/`+Live.Domain, 1)
+	Set.All = strings.Replace(Set.All, Set.Directory, `../../archive/`+Live.Domain, 1)
 
 	if err := activateFile(`certificate`, Set.Certificate, Live.Certificate); err != nil {
 		return err
@@ -136,6 +146,9 @@ func (Set *FilePathSet) Activate(Live FilePathSet) error {
 		return err
 	}
 	if err := activateFile(`private key`, Set.PrivateKey, Live.PrivateKey); err != nil {
+		return err
+	}
+	if err := activateFile(`all`, Set.All, Live.All); err != nil {
 		return err
 	}
 
