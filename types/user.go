@@ -16,7 +16,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"gopkg.in/square/go-jose.v2"
 
-	"github.com/ottodashadow/lego-consul/paths"
+	"github.com/feedonomics/lego-consul/paths"
 )
 
 var (

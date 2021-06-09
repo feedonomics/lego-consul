@@ -12,11 +12,11 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
-	"github.com/ottodashadow/lego-consul/config"
-	"github.com/ottodashadow/lego-consul/paths"
-	"github.com/ottodashadow/lego-consul/solvers"
-	"github.com/ottodashadow/lego-consul/types"
-	"github.com/ottodashadow/lego-consul/utility"
+	"github.com/feedonomics/lego-consul/config"
+	"github.com/feedonomics/lego-consul/paths"
+	"github.com/feedonomics/lego-consul/solvers"
+	"github.com/feedonomics/lego-consul/types"
+	"github.com/feedonomics/lego-consul/utility"
 )
 
 var generateCmd = &cobra.Command{

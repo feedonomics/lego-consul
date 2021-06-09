@@ -15,7 +15,7 @@ linters-settings:
   gofmt:
     simplify: true
   goimports:
-    local-prefixes: github.com/ottodashadow/lego-consul
+    local-prefixes: github.com/feedonomics/lego-consul
   maligned:
     suggest-new: true
 

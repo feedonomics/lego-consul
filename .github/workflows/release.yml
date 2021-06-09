@@ -46,7 +46,7 @@ jobs:
           go-version: ${{ env.GO_VERSION }}
 
       - name: Build for Linux/macOS
-        run: go build -ldflags "-s -w -X github.com/ottodashadow/lego-consul/version.commit=`git describe --always --dirty` -X github.com/ottodashadow/lego-consul/version.date=`date -u +%FT%TZ`" -o bin/lego-consul main/main.go
+        run: go build -ldflags "-s -w -X github.com/feedonomics/lego-consul/version.commit=`git describe --always --dirty` -X github.com/feedonomics/lego-consul/version.date=`date -u +%FT%TZ`" -o bin/lego-consul main/main.go
 
       - name: Get CLI version
         id: get_version

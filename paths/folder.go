@@ -14,7 +14,7 @@ import (
 	"github.com/go-acme/lego/v4/certificate"
 	"github.com/sirupsen/logrus"
 
-	"github.com/ottodashadow/lego-consul/config"
+	"github.com/feedonomics/lego-consul/config"
 )
 
 type FilePathSet struct {

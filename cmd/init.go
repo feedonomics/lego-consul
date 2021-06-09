@@ -5,8 +5,8 @@ import (
 
 	"github.com/go-acme/lego/v4/lego"
 
-	"github.com/ottodashadow/lego-consul/config"
-	"github.com/ottodashadow/lego-consul/version"
+	"github.com/feedonomics/lego-consul/config"
+	"github.com/feedonomics/lego-consul/version"
 )
 
 var (

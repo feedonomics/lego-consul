@@ -1,4 +1,4 @@
-module github.com/ottodashadow/lego-consul
+module github.com/feedonomics/lego-consul
 
 go 1.15
 

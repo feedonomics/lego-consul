@@ -13,7 +13,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
-	"github.com/ottodashadow/lego-consul/config"
+	"github.com/feedonomics/lego-consul/config"
 )
 
 type consulCfg struct {
