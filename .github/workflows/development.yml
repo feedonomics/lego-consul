@@ -18,7 +18,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.16
+          go-version: 1.17.5
 
       - name: Run tests
         run: go test -v -p 1 -timeout 10m ./... -coverprofile=coverage.txt -covermode=atomic
@@ -37,7 +37,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.16
+          go-version: 1.17.5
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v2
         with:
