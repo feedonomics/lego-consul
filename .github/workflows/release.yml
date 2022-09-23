@@ -5,7 +5,7 @@ on:
     tags: 'v*'
 
 env:
-  GO_VERSION: 1.17.7
+  GO_VERSION: 1.19.1
 
 jobs:
   create-release:
@@ -23,54 +23,33 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Save release upload URL
-        run: echo "${{ steps.create_release.outputs.upload_url }}" > ./upload_url.txt
-        shell: bash
-
-      - name: Store release upload URL
-        uses: actions/upload-artifact@v2
-        with:
-          name: upload_url
-          path: ./upload_url.txt
-
-  publish:
-    name: Publish binary
-    needs: create-release
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: ${{ env.GO_VERSION }}
 
-      - name: Build for Linux/macOS
-        run: go build -ldflags "-s -w -X github.com/feedonomics/lego-consul/version.commit=`git describe --always --dirty` -X github.com/feedonomics/lego-consul/version.date=`date -u +%FT%TZ`" -o bin/lego-consul main/main.go
-
-      - name: Get CLI version
-        id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-        shell: bash
-
-      - name: Download release upload URL
-        uses: actions/download-artifact@v2
-        with:
-          name: upload_url
-
-      - name: Get release upload URL
-        id: upload_url
+      - name: Gather Build Info
+        id: build_info
         run: |
-          URL=$(cat upload_url.txt)
-          echo "::set-output name=url::${URL}"
-        shell: bash
+          echo ::set-output name=BUILD_COMMIT::`git describe --always --dirty`
+          echo ::set-output name=BUILD_DATE::`date -u +%FT%TZ`
+          echo ::set-output name=BUILD_VERSION::${GITHUB_REF/refs\/tags\//}
 
-      - name: Upload Linux/macOS Release
+      - name: Build for Linux/macOS
+        run: go build -ldflags "-s -w -X ${INJECT_VERSION} -X ${INJECT_COMMIT} -X ${INJECT_DATE}" -o bin/lego-consul main/main.go
+        env:
+          CGO_ENABLED: 0
+          INJECT_VERSION: "github.com/feedonomics/lego-consul/version.version=${{ steps.build_info.outputs.BUILD_VERSION }}"
+          INJECT_COMMIT: "github.com/feedonomics/lego-consul/version.commit=${{ steps.build_info.outputs.BUILD_COMMIT }}"
+          INJECT_DATE: "github.com/feedonomics/lego-consul/version.built=${{ steps.build_info.outputs.BUILD_DATE }}"
+
+      - name: Upload Linux Release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.upload_url.outputs.url }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./bin/lego-consul
-          asset_name: lego_consul_${{ steps.get_version.outputs.VERSION }}_linux_x86_64
+          asset_name: lego_consul_${{ steps.build_info.outputs.BUILD_VERSION }}_linux_x86_64
           asset_content_type: application/octet-stream

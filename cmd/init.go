@@ -52,7 +52,10 @@ func init() {
 	httpConsulCmd.Flags().StringVar(&httpConsulBind, `bind`, `127.0.0.1:5002`, `Address and port to listen on.`)
 
 	RootCmd.Flags().BoolP("version", "v", false, "")
-	RootCmd.Version = version.String()
+	RootCmd.Version = version.Get().String()
 	RootCmd.SetVersionTemplate(`{{printf "LEGO Consul "}}{{printf "%s" .Version}}
 `)
+
+	versionCmd.Flags().BoolVar(&versionShort, `short`, false, `Display short version`)
+	RootCmd.AddCommand(versionCmd)
 }
