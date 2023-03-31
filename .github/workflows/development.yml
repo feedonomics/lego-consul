@@ -9,7 +9,7 @@ on:
   pull_request:
 
 env:
-  GO_VERSION: 1.19.1
+  GO_VERSION: 1.20.2
 
 jobs:
   test-deploy:
